@@ -7,8 +7,7 @@ import torch
 import pytorch_lightning as pl
 import wandb
 
-from text_recognizer import lit_models
-
+from round_cell_classifier import lit_models
 
 # In order to ensure reproducible experiments, we must set random seeds.
 np.random.seed(42)
@@ -68,60 +67,64 @@ def main():
     python training/run_experiment.py --max_epochs=3 --gpus='0,' --num_workers=20 --model_class=MLP --data_class=MNIST
     ```
     """
-    parser = _setup_parser()
-    args = parser.parse_args()
-    data_class = _import_class(f"text_recognizer.data.{args.data_class}")
-    model_class = _import_class(f"text_recognizer.models.{args.model_class}")
-    data = data_class(args)
-    model = model_class(data_config=data.config(), args=args)
+    # parser = _setup_parser()
+    # args = parser.parse_args()
+    # data_class = _import_class(f"text_recognizer.data.{args.data_class}")
+    # model_class = _import_class(f"text_recognizer.models.{args.model_class}")
+    # data = data_class(args)
+    # model = model_class(data_config=data.config(), args=args)
+    
+    data_class = _import_class(f"round_cell_classifier.data.round_cell_cytology_datamodule.RoundCellCytology")
+    data = data_class(batch_size=32, data_dir='test_image_data', label_filename='kannada.csv')
+    model_class = _import_class(f"round_cell_classifier.models.cnn.CNN")
+    model = model_class(data_config=data.config())
+    lit_model_class = lit_models.BaseLitModel
+    # if args.loss not in ("ctc", "transformer"):
+    #     lit_model_class = lit_models.BaseLitModel
+    # # Hide lines below until Lab 3
+    # if args.loss == "ctc":
+    #     lit_model_class = lit_models.CTCLitModel
+    # # Hide lines above until Lab 3
+    # # Hide lines below until Lab 4
+    # if args.loss == "transformer":
+    #     lit_model_class = lit_models.TransformerLitModel
+    # # Hide lines above until Lab 4
 
-    if args.loss not in ("ctc", "transformer"):
-        lit_model_class = lit_models.BaseLitModel
-    # Hide lines below until Lab 3
-    if args.loss == "ctc":
-        lit_model_class = lit_models.CTCLitModel
-    # Hide lines above until Lab 3
-    # Hide lines below until Lab 4
-    if args.loss == "transformer":
-        lit_model_class = lit_models.TransformerLitModel
-    # Hide lines above until Lab 4
-
-    if args.load_checkpoint is not None:
-        lit_model = lit_model_class.load_from_checkpoint(args.load_checkpoint, args=args, model=model)
-    else:
-        lit_model = lit_model_class(args=args, model=model)
+    # if args.load_checkpoint is not None:
+    #     lit_model = lit_model_class.load_from_checkpoint(args.load_checkpoint, args=args, model=model)
+    # else:
+    lit_model = lit_model_class(model=model)
 
     logger = pl.loggers.TensorBoardLogger("training/logs")
     # Hide lines below until Lab 5
-    if args.wandb:
-        logger = pl.loggers.WandbLogger()
-        logger.watch(model)
-        logger.log_hyperparams(vars(args))
+    # if args.wandb:
+    #     logger = pl.loggers.WandbLogger()
+    #     logger.watch(model)
+    #     logger.log_hyperparams(vars(args))
     # Hide lines above until Lab 5
 
-    early_stopping_callback = pl.callbacks.EarlyStopping(monitor="val_loss", mode="min", patience=10)
-    model_checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        filename="{epoch:03d}-{val_loss:.3f}-{val_cer:.3f}", monitor="val_loss", mode="min"
-    )
-    callbacks = [early_stopping_callback, model_checkpoint_callback]
+    # early_stopping_callback = pl.callbacks.EarlyStopping(monitor="val_loss", mode="min", patience=10)
+    # model_checkpoint_callback = pl.callbacks.ModelCheckpoint(
+    #     filename="{epoch:03d}-{val_loss:.3f}-{val_cer:.3f}", monitor="val_loss", mode="min"
+    # )
+    # callbacks = [early_stopping_callback, model_checkpoint_callback]
 
-    args.weights_summary = "full"  # Print full summary of the model
-    trainer = pl.Trainer.from_argparse_args(args, callbacks=callbacks, logger=logger, weights_save_path="training/logs")
-
+    # args.weights_summary = "full"  # Print full summary of the model
+    trainer = pl.Trainer(logger=logger, weights_save_path="training/logs", max_epochs=100, gpus=0, overfit_batches=0.01)
     # pylint: disable=no-member
-    trainer.tune(lit_model, datamodule=data)  # If passing --auto_lr_find, this will set learning rate
+    # trainer.tune(lit_model, datamodule=data)  # If passing --auto_lr_find, this will set learning rate
 
     trainer.fit(lit_model, datamodule=data)
-    trainer.test(lit_model, datamodule=data)
+    # trainer.test(lit_model, datamodule=data)
     # pylint: enable=no-member
 
     # Hide lines below until Lab 5
-    best_model_path = model_checkpoint_callback.best_model_path
-    if best_model_path:
-        print("Best model saved at:", best_model_path)
-        if args.wandb:
-            wandb.save(best_model_path)
-            print("Best model also uploaded to W&B")
+    # best_model_path = model_checkpoint_callback.best_model_path
+    # if best_model_path:
+    #     print("Best model saved at:", best_model_path)
+    #     if args.wandb:
+    #         wandb.save(best_model_path)
+    #         print("Best model also uploaded to W&B")
     # Hide lines above until Lab 5
 
 

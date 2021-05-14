@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+IMAGE_SIZE = 32
+
 class ConvBlock(nn.Module):
     """
     Simple 3x3 conv with padding size 1 (to leave the input size unchanged), followed by a ReLU.
@@ -68,8 +70,6 @@ class CNN(nn.Module):
         torch.Tensor
             (B, C) tensor
         """
-        _B, _C, H, W = x.shape
-        assert H == W == 28
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.max_pool(x)
