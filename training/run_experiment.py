@@ -7,6 +7,9 @@ import torch
 import pytorch_lightning as pl
 import wandb
 
+import sys
+sys.path.append('/Users/a/OneDrive/Documents/Pathology Project/veterinary-round-cell-cytology/')
+
 from round_cell_classifier import lit_models
 
 # In order to ensure reproducible experiments, we must set random seeds.
@@ -75,7 +78,7 @@ def main():
     # model = model_class(data_config=data.config(), args=args)
     
     data_class = _import_class(f"round_cell_classifier.data.round_cell_cytology_datamodule.RoundCellCytology")
-    data = data_class(batch_size=32, data_dir='test_image_data', label_filename='kannada.csv')
+    data = data_class(batch_size=32, data_dir='Data', label_filename='pathology_project_labels.csv', image_size=32)
     model_class = _import_class(f"round_cell_classifier.models.cnn.CNN")
     model = model_class(data_config=data.config())
     lit_model_class = lit_models.BaseLitModel
@@ -110,7 +113,7 @@ def main():
     # callbacks = [early_stopping_callback, model_checkpoint_callback]
 
     # args.weights_summary = "full"  # Print full summary of the model
-    trainer = pl.Trainer(logger=logger, weights_save_path="training/logs", max_epochs=100, gpus=0, overfit_batches=0.01)
+    trainer = pl.Trainer(logger=logger, weights_save_path="training/logs", max_epochs=100, gpus=0)
     # pylint: disable=no-member
     # trainer.tune(lit_model, datamodule=data)  # If passing --auto_lr_find, this will set learning rate
 

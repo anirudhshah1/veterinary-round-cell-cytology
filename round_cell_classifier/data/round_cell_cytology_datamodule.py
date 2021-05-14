@@ -14,18 +14,18 @@ class RoundCellCytology(pl.LightningDataModule):
     Round Cell Classification DataModule.
     """
 
-    def __init__(self, batch_size: int, data_dir: str, label_filename: str) -> None:
+    def __init__(self, batch_size: int, data_dir: str, label_filename: str, image_size: int) -> None:
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Resize((32, 32)),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Resize((image_size, image_size)),
+            transforms.Normalize((0.5, 0.5, 0.5, 0.5), (0.5, 0.5, 0.5, 0.5))
         ])
-        self.dims = (3, 32, 32)
+        self.dims = (4, image_size, image_size)
         self.output_dims = (1,)
-        self.mapping = list(range(6))
+        self.mapping = list(range(7))
         self.label_filename = label_filename
         # self.num_workers = NUM_WORKERS
         self.on_gpu = True if torch.cuda.device_count() > 0 else False
