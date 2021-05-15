@@ -78,3 +78,6 @@ class CNN(nn.Module):
         x = F.relu(x)
         x = self.fc2(x)
         return x
+
+    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:1.8.1-gpu-py36-cu111-ubuntu18.04
+

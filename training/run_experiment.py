@@ -76,7 +76,7 @@ def main():
     # model_class = _import_class(f"text_recognizer.models.{args.model_class}")
     # data = data_class(args)
     # model = model_class(data_config=data.config(), args=args)
-    
+    num_gpus = torch.cuda.device_count()
     data_class = _import_class(f"round_cell_classifier.data.round_cell_cytology_datamodule.RoundCellCytology")
     data = data_class(batch_size=32, data_dir='Data', label_filename='pathology_project_labels.csv', image_size=32)
     model_class = _import_class(f"round_cell_classifier.models.cnn.CNN")
@@ -103,7 +103,7 @@ def main():
     # callbacks = [early_stopping_callback, model_checkpoint_callback]
 
     # args.weights_summary = "full"  # Print full summary of the model
-    trainer = pl.Trainer(logger=logger, weights_save_path="training/logs", max_epochs=3, gpus=0)
+    trainer = pl.Trainer(logger=logger, weights_save_path="training/logs", max_epochs=3, gpus=num_gpus)
     # pylint: disable=no-member
     # trainer.tune(lit_model, datamodule=data)  # If passing --auto_lr_find, this will set learning rate
 
