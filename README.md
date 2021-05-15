@@ -24,6 +24,6 @@ The aims of this project were threefold:
 - Generate test set accuracy for models and compare.
 
 ### Notes
-- The dataset will be published publicly, however I am waiting on verification of the labels from a second and third pathologist.
+- The dataset will be published publicly, however I am waiting on verification of the labels from a second and third pathologist. (This is why I do not want the project video to be shared publicly.)
 - The code in this repo is very rough, and I would say in draft form. My plan is clean up this code, build a robust CI/CD pipeline, improve the documentation.
 - Much of the work on this project is rough, a draft version, and needs cleaning up for public utilization. 
