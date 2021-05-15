@@ -82,16 +82,6 @@ def main():
     model_class = _import_class(f"round_cell_classifier.models.cnn.CNN")
     model = model_class(data_config=data.config())
     lit_model_class = lit_models.BaseLitModel
-    # if args.loss not in ("ctc", "transformer"):
-    #     lit_model_class = lit_models.BaseLitModel
-    # # Hide lines below until Lab 3
-    # if args.loss == "ctc":
-    #     lit_model_class = lit_models.CTCLitModel
-    # # Hide lines above until Lab 3
-    # # Hide lines below until Lab 4
-    # if args.loss == "transformer":
-    #     lit_model_class = lit_models.TransformerLitModel
-    # # Hide lines above until Lab 4
 
     # if args.load_checkpoint is not None:
     #     lit_model = lit_model_class.load_from_checkpoint(args.load_checkpoint, args=args, model=model)
@@ -101,9 +91,9 @@ def main():
     logger = pl.loggers.TensorBoardLogger("training/logs")
     # Hide lines below until Lab 5
     # if args.wandb:
-    #     logger = pl.loggers.WandbLogger()
-    #     logger.watch(model)
-    #     logger.log_hyperparams(vars(args))
+    logger = pl.loggers.WandbLogger()
+    logger.watch(model)
+    # logger.log_hyperparams(vars(args)
     # Hide lines above until Lab 5
 
     # early_stopping_callback = pl.callbacks.EarlyStopping(monitor="val_loss", mode="min", patience=10)
@@ -113,7 +103,7 @@ def main():
     # callbacks = [early_stopping_callback, model_checkpoint_callback]
 
     # args.weights_summary = "full"  # Print full summary of the model
-    trainer = pl.Trainer(logger=logger, weights_save_path="training/logs", max_epochs=100, gpus=0)
+    trainer = pl.Trainer(logger=logger, weights_save_path="training/logs", max_epochs=3, gpus=0)
     # pylint: disable=no-member
     # trainer.tune(lit_model, datamodule=data)  # If passing --auto_lr_find, this will set learning rate
 
